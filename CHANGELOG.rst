@@ -1,6 +1,24 @@
 Changelog
 =========
 
+v1.5.3
+------
+
+- Really include ``phpunit`` does not require '_testuite' as suffix of the test suites
+
+v1.5.2
+------
+
+- Update default config for Moodle 3.0 release
+- New script to refresh the services and external functions
+- ``phpunit`` does not require '_testuite' as suffix of the test suites
+- New script to fix the version numbers - Adrian Greeve
+
+v1.5.1
+------
+
+- Update default config for Moodle 2.9 release
+
 v1.5
 ----
 
