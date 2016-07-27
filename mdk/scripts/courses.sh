@@ -17,5 +17,5 @@ fi
 echo "Generating test courses ..."
 
 cd "$P"
-sudo -u apache php admin/tool/generator/cli/maketestcourse.php --shortname="C001-S" --size=S
-sudo -u apache php admin/tool/generator/cli/maketestcourse.php --shortname="C002-L" --size=L
+sudo -u apache php admin/tool/generator/cli/maketestcourse.php --shortname="S course" --size=S
+sudo -u apache php admin/tool/generator/cli/maketestcourse.php --shortname="XS course" --size=XS
