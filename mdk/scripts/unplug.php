@@ -6,6 +6,7 @@
 // a lot as-is during plugins reviews.
 
 define('CLI_SCRIPT', true);
+define('IGNORE_COMPONENT_CACHE', true);
 
 require(__DIR__.'/config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -40,13 +41,25 @@ $del = [];
 foreach ($contribs as $plugin) {
     if ($pluginman->can_uninstall_plugin($plugin->component)) {
         // Seems like it has no dependencies and be uninstalled anytime.
+        mtrace('easy to uninstall '.$plugin->component);
         array_push($del, $plugin->component);
     } else {
-        foreach ($pluginman->other_plugins_that_require($plugin->component) as $dependency) {
-            if ($pluginman->can_uninstall_plugin($dependency)) {
-                array_unshift($del, $dependency);
+        mtrace('cannot uninstall '.$plugin->component.' - checking dependencies');
+        foreach ($pluginman->other_plugins_that_require($plugin->component) as $dependent) {
+            if (!isset($contribs[$dependent])) {
+                cli_error('Unexpected dependency - standard plugin '.$dependent.' depends on a non-standard '.$plugin->component);
             } else {
-                die('Unable to uninstall '.$dependency);
+                $depinfo = $contribs[$dependent];
+            }
+            if ($depinfo->get_status() === core_plugin_manager::PLUGIN_STATUS_NEW) {
+                mtrace(' ... is required by not yet installed '.$dependent);
+                array_unshift($del, $dependent);
+            } else if ($pluginman->can_uninstall_plugin($dependent)) {
+                mtrace(' ... is required by '.$dependent.' that can be uninstalled easily');
+                array_unshift($del, $dependent);
+            } else {
+                mtrace(' ... is required by '.$dependent.' that cannot be uninstalled easily!');
+                array_unshift($del, $dependent);
             }
         }
         array_push($del, $plugin->component);
@@ -77,12 +90,16 @@ foreach ($del as $plugin) {
         } else {
             throw $e;
         }
-    }
-
-	if (function_exists('opcache_reset')) {
-		opcache_reset();
 	}
+
 }
+
+clearstatcache();
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
+
+core_plugin_manager::reset_caches();
 
 if (!empty($man)) {
     cli_heading('Some plugin folders must be deleted manually');
