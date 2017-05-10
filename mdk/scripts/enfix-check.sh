@@ -22,6 +22,9 @@ while read -r line; do
         # normalize backslashes
         search=$(echo "${search}" | sed 's/\\//g')
 
+        # get rid of tags
+        search=$(echo "${search}" | sed 's/<[^>]*>//g')
+
         while read -r error; do
             echo "ERROR: Commit removes '${search}' still used in '${error}'"
             retcode=1
