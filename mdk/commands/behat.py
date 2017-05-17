@@ -246,7 +246,12 @@ class BehatCommand(Command):
                     cmd.append('--format="progress" --out="{0}/progress.txt"'.format(outputDir))
                     cmd.append('--format="pretty" --out="{0}/pretty.txt"'.format(outputDir))
 
-            cmd.append('--config=%s/behat/behat.yml' % (M.get('behat_dataroot')))
+            configcandidates = ['%s/behat/behat.yml' % (M.get('behat_dataroot'))]
+            if M.branch_compare(32):
+                # Since Moodle 3.2.2 behat directory is kept under $CFG->behat_dataroot for single and parallel runs.
+                configcandidates.insert(0, '%s/behatrun/behat/behat.yml' % (M.get('behat_dataroot')))
+
+            cmd.append('--config=%s' % (filter(os.path.isfile, configcandidates)[0]))
 
             # Checking feature argument
             if args.feature:

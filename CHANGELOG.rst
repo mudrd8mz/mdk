@@ -1,6 +1,20 @@
 Changelog
 =========
 
+v1.6.2
+------
+
+- Update config for Moodle 3.3 - Jun Pataleta
+- MySQL UTF-8 byte characters fix - Dan Poltawski
+
+v1.6.1
+------
+
+- New script ``mindev`` for minimal development settings
+- New script ``setup`` for bulk set-up for development
+- Scripts can call other scripts
+- Handle Behat path changes from 3.2.2 - Rajesh Taneja
+
 v1.6.0
 ------
 
