@@ -12,7 +12,7 @@ pushd "$(git rev-parse --show-toplevel)" > /dev/null
 echo "Checking commit ${commit}"
 
 while read -r line; do
-    if [[ ${line} =~ ^-\$string\[.*=\ *\'(.*)\'\; ]]; then
+    if [[ ${line} =~ ^-\$string\[.*=\ *\'(.+)\'\; ]]; then
         ((count++))
         search=${BASH_REMATCH[1]}
 
