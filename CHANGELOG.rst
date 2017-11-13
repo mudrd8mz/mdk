@@ -1,6 +1,21 @@
 Changelog
 =========
 
+v1.6.4
+------
+
+- Update config for Moodle 3.4 - Jun Pataleta
+- Add .idea to .gitignore - Jun Pataleta
+
+
+v1.6.3
+------
+
+- New script ``tokens`` to list external tokens
+- Ignore non-warning logging messages from keyring.backend
+- Script to set-up a 'security' repository - David Monllao
+- Always display precheck URL - David Mudrak
+
 v1.6.2
 ------
 
