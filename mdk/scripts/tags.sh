@@ -36,10 +36,8 @@ if [ $? -eq 1 ]; then
 else
     echo "Generating the ctags ..."
     cd "$P"
-    ctags --format=2 --languages=PHP --PHP-kinds=+cidf-v --recurse=yes  --exclude=tags --exclude="config*.php" \
-          --exclude="lang/*" --exclude="install/lang/*" --exclude="cscope.*" --exclude="Makefile" \
-          --exclude="moodledata/*" --exclude="phpunit.xml" --exclude=".git/*" \
-          --regex-PHP='/abstract\s+class\s+([^ ]+)/\1/c/' \
-          --regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/' \
-          --extra=+q
+    ctags -R --languages=php --fields=+aimS --php-kinds=cdfint --tag-relative=yes --totals=yes --exclude=tags --exclude="config*.php" \
+        --exclude="lang/*" --exclude="install/lang/*" --exclude="cscope.*" --exclude="Makefile" \
+        --exclude="moodledata/*" --exclude="phpunit.xml" --exclude=".git/*" \
+        --extra=+q
 fi
