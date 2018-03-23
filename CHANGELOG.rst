@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v1.7.1
+- Fix missing assignment of the sqlsrv cursor - Jun Pataleta
+
+v1.7.0
+------
+
+- Support creation of instances running on SQL Server. - Jun Pataleta
+- Warn the user if the keyring module can't be loaded - David Mudrák
+
 v1.6.4
 ------
 
