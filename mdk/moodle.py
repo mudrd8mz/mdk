@@ -26,6 +26,7 @@ import os
 import re
 import logging
 import shutil
+import subprocess
 from tempfile import gettempdir
 
 from .tools import getMDLFromCommitMessage, mkdir, process, parseBranch
@@ -806,3 +807,26 @@ class Moodle(object):
         # Return to previous branch
         if not nocheckout:
             self.checkout_stable(False)
+
+    def uninstallPlugins(self, name):
+        """Calls the CLI to uninstall a plugin"""
+
+        if not self.branch_compare(37):
+            raise Exception('Uninstalling plugins is only available from Moodle 3.7.')
+
+        cli = '/admin/cli/uninstall_plugins.php'
+        args = '--plugins=' + name + ' --run'
+
+        result = self.cli(cli, args, stdout=subprocess.PIPE, stderr=None)
+        try:
+            result[1]
+            resultstring = result[1].split('\n', 1)
+            cannotuninstall = resultstring[0].rfind('Can not be uninstalled')
+            if cannotuninstall != -1:
+                raise Exception('The plugin could not be uninstalled')
+        except IndexError as e:
+            # We should always have some text returned and so should not end up here. And we
+            # raise the exception as we're unsure whether the plugin was uninstalled properly
+            # so it's better to halt the process.
+            logging.error('The plugin uninstall cli code has changed and I need to be updated.')
+            raise e
