@@ -9,6 +9,6 @@ define('CLI_SCRIPT', true);
 
 require(__DIR__.'/config.php');
 
-foreach ($DB->get_records('capabilities', null, 'name', 'id, name') as $cap) {
-    echo $cap->name.PHP_EOL;
+foreach ($DB->get_records('capabilities', null, 'name', '*') as $cap) {
+    echo "$cap->name\t$cap->captype\t$cap->contextlevel\t$cap->riskbitmask".PHP_EOL;
 }
