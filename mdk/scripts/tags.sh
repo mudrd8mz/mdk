@@ -36,8 +36,6 @@ if [ $? -eq 1 ]; then
 else
     echo "Generating the ctags ..."
     cd "$P"
-    ctags -R --languages=php --fields=+aimS --php-kinds=cdfint --tag-relative=yes --totals=yes --exclude=tags --exclude="config*.php" \
-        --exclude="lang/*" --exclude="install/lang/*" --exclude="cscope.*" --exclude="Makefile" \
-        --exclude="moodledata/*" --exclude="phpunit.xml" --exclude=".git/*" \
-        --extra=+q
+    ctags -R --fields=+aimS --php-kinds=cdfint --languages=php --extras=+q --tag-relative=yes --exclude=".git" --exclude="vendor" \
+        --exclude="node_modules" --exclude="composer.phar" --totals=yes
 fi
