@@ -1,6 +1,19 @@
 Changelog
 =========
 
+v2.0.0
+------
+- Added support for Python 3.6
+- Dropped support for Python 2
+- Script `webservices` enables the Mobile services
+- Fixed issue when installing plugins from local repository
+
+v1.7.6
+------
+- Language caching is no longer enabled in `mindev` script
+- JavaScript caching is no longer enabled in `mindev` script
+- Selenium versions to download were not accurately identified
+
 v1.7.5
 ------
 - Add support for repeating tests - Jun Pataleta

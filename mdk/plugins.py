@@ -24,8 +24,9 @@ http://github.com/FMCorz/mdk
 
 import os
 import json
-import httplib
-from urllib import urlencode, urlretrieve
+import http.client
+from urllib.parse import urlencode
+from urllib.request import urlretrieve
 import logging
 import zipfile
 import re
@@ -217,7 +218,7 @@ class PluginManager(object):
         while head and head != '/' and not pluginOrSubsystem:
             # Check plugin types.
             if not pluginOrSubsystem:
-                for k, v in cls._pluginTypesPath.iteritems():
+                for k, v in cls._pluginTypesPath.items():
                     if v == candidate:
                         pluginOrSubsystem = k
                         pluginName = tail
@@ -225,14 +226,14 @@ class PluginManager(object):
 
             # Check sub plugin types.
             if not pluginOrSubsystem:
-                for k, v in subtypes.iteritems():
+                for k, v in subtypes.items():
                     if v == candidate:
                         pluginOrSubsystem = k
                         pluginName = tail
                         break
 
             # Check subsystems.
-            for k, v in cls._subSystems.iteritems():
+            for k, v in cls._subSystems.items():
                 if v == candidate:
                     pluginOrSubsystem = k
                     break
@@ -356,11 +357,13 @@ class PluginDownloadInfo(dict):
         if not fileCache:
             dest = gettempdir()
 
-        if not 'downloadurl' in self.keys():
+        if not 'version' in list(self.keys()):
+            raise ValueError('Expecting the key version')
+        elif not 'downloadurl' in list(self.keys()):
             raise ValueError('Expecting the key downloadurl')
-        elif not 'component' in self.keys():
+        elif not 'component' in list(self.keys()):
             raise ValueError('Expecting the key component')
-        elif not 'branch' in self.keys():
+        elif not 'branch' in list(self.keys()):
             raise ValueError('Expecting the key branch')
 
         dl = self.get('downloadurl')
@@ -373,7 +376,7 @@ class PluginDownloadInfo(dict):
         if fileCache:
             if not os.path.isdir(dest):
                 logging.debug('Creating directory %s' % (dest))
-                tools.mkdir(dest, 0777)
+                tools.mkdir(dest, 0o777)
 
             if os.path.isfile(target) and (md5sum == None or tools.md5file(target) == md5sum):
                 logging.info('Found cached plugin file: %s' % (os.path.basename(target)))
@@ -434,6 +437,7 @@ class PluginRepository(object):
                 logging.info('Found a compatible version for the plugin in local repository')
                 info['component'] = plugin
                 info['branch'] = branch
+                info['version'] = branch
                 return PluginDownloadInfo(info)
 
         # Contacting the remote repository
@@ -469,9 +473,9 @@ class PluginRepository(object):
             data = ''
 
         if self.ssl:
-            r = httplib.HTTPSConnection(self.host)
+            r = http.client.HTTPSConnection(self.host)
         else:
-            r = httplib.HTTPConnection(self.host)
+            r = http.client.HTTPConnection(self.host)
         logging.debug('%s %s%s' % (method, self.host, uri))
         r.request(method, uri, data, headers)
 

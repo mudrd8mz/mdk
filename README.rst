@@ -7,7 +7,7 @@ Requirements
 ============
 
 - Linux or Mac OS
-- Python 2.7
+- Python 3.6
 - MySQL, MariaDB or PostgreSQL
 - Git v1.7.7 or greater
 
@@ -38,11 +38,20 @@ On Debian-based systems, install the following packages::
 
 Use `pip <http://www.pip-installer.org/en/latest/installing.html>`_::
 
-    sudo pip install moodle-sdk
+    pip install moodle-sdk --user
     mdk init
 
-That's it!
+Notes
+~~~~~
 
+This method does not require ``sudo`` as it installs MDK for the current user. It is assumed that ``~/.local/bin`` is in your PATH (or `equivalent <https://docs.python.org/3/library/site.html#site.USER_BASE>`_).
+
+If it isn't, this snippet for ``~/.profile`` might be useful::
+
+    # Set PATH so it includes user's private local bin if it exists.
+    if [ -d "$HOME/.local/bin" ] ; then
+        PATH="$HOME/.local/bin:$PATH"
+    fi
 
 Homebrew
 --------
@@ -63,7 +72,7 @@ On Debian-based systems, you will need to install the following packages::
 
 Then from the directory where you cloned the repository::
 
-    sudo python setup.py develop
+    python setup.py develop --user
     mdk init
 
 
@@ -87,7 +96,7 @@ Upgrading
 
 If you installed MDK using PIP, run the following command::
 
-    sudo pip install --upgrade moodle-sdk
+    pip install --user --upgrade moodle-sdk
 
 It is possible that a new version of MDK requires new files, directories, etc... and while we try to make it easy to upgrade, it can happen that some features get broken in your environment. So after each upgrade, consider running the following to get more information::
 
