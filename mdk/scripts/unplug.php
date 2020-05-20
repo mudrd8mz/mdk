@@ -74,14 +74,18 @@ if ('y' !== cli_input('Uninstall and remove these plugins? [y/n]')) {
     exit(1);
 }
 
-// And finally attempt to uninstall and delete the plugins.
-$man = [];
+// Attempt to uninstall the plugins.
 foreach ($del as $plugin) {
     cli_writeln('Uninstalling '.$plugin);
-	$progress = new progress_trace_buffer(new text_progress_trace());
-	$pluginman->uninstall_plugin($plugin, $progress);
-	$progress->finished();
+    $progress = new progress_trace_buffer(new text_progress_trace());
+    $pluginman->uninstall_plugin($plugin, $progress);
+    $progress->finished();
+}
 
+$man = [];
+
+// Delete the plugin folders.
+foreach ($del as $plugin) {
     try {
         $pluginman->remove_plugin_folder($contribs[$plugin]);
     } catch (moodle_exception $e) {
@@ -90,11 +94,11 @@ foreach ($del as $plugin) {
         } else {
             throw $e;
         }
-	}
-
+    }
 }
 
 clearstatcache();
+
 if (function_exists('opcache_reset')) {
     opcache_reset();
 }
