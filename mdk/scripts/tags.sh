@@ -36,6 +36,6 @@ if [ $? -eq 1 ]; then
 else
     echo "Generating the ctags ..."
     cd "$P"
-    ctags -R --fields=+aimS --php-kinds=cdfint --languages=php --extras=+q --tag-relative=yes --exclude=".git" --exclude="vendor" \
-        --exclude="node_modules" --exclude="composer.phar" --totals=yes
+    ctags -R --fields=+aimS --php-kinds=cdfint --languages=php --extras=+q --tag-relative=yes --output-format=e-ctags \
+        --exclude=".git" --exclude="vendor" --exclude="node_modules" --exclude="composer.phar" --totals=yes
 fi
