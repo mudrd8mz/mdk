@@ -1,0 +1,6 @@
+This is how I install the custom-scripts version locally. Doing this after
+updating mdk from upstream.
+
+    $ cd ~/git/mdk
+
+    $ pip install --user .
