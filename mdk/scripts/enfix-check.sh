@@ -25,6 +25,9 @@ while read -r line; do
         # get rid of tags
         search=$(echo "${search}" | sed 's/<[^>]*>//g')
 
+        # quote some regular expression characters - light version of preg_quote()
+        search=$(echo "${search}" | sed 's/\(\[\|\]\)/\\\1/g')
+
         while read -r error; do
             echo "ERROR: Commit removes '${search}' still used in '${error}'"
             retcode=1
