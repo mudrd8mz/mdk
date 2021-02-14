@@ -63,19 +63,17 @@ mdk_set_config('requiremodintro', 0, 'url');
 // Don't cache templates.
 mdk_set_config('cachetemplates', 0);
 
-// Adds FirePHP
-$firephp = "
-// FirePHP
-if (@include_once('FirePHPCore/fb.php')) {
-    ob_start();
-}
-";
-$conffile = dirname(__FILE__) . '/config.php';
-if ($content = file_get_contents($conffile)) {
-    if (strpos($content, "include_once('FirePHPCore/fb.php')") === false) {
-        if ($f = fopen($conffile, 'a')) {
-            fputs($f, $firephp);
-            fclose($f);
-        }
+// Inject Behat profiles manager.
+$configpath = __DIR__ . '/config.php';
+
+if (is_readable($configpath)) {
+    $configfile = file_get_contents($configpath);
+
+    if (strpos($configfile, 'moodle-browser-config') === false) {
+        mtrace("Injecting moodle-browser-config");
+        $insert = "require_once(__DIR__ . '/../../../moodle-browser-config/init.php');";
+        $before = "require_once(__DIR__ . '/lib/setup.php');";
+        $newconfig = str_replace($before, $insert . PHP_EOL . $before, $configfile);
+        file_put_contents($configpath, $newconfig);
     }
 }
