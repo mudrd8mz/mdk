@@ -130,6 +130,10 @@ class Workplace(object):
         extraDir = self.getPath(name, 'extra')
         linkDir = os.path.join(self.www, name)
         extraLinkDir = os.path.join(self.getMdkWebDir(), name)
+        branch = stableBranch(version)
+
+        useCacheAsUpstream = C.get('useCacheAsUpstreamRemote')
+        cloneAsShared = useCacheAsUpstream and C.get('useCacheAsSharedClone')
 
         if self.isMoodle(name):
             raise CreateException('The Moodle instance %s already exists' % name)
@@ -147,7 +151,8 @@ class Workplace(object):
 
         # Clone the instances
         logging.info('Cloning repository...')
-        process('%s clone %s %s' % (C.get('git'), repository, wwwDir))
+        process(f'{C.get("git")} clone --branch {branch} --single-branch '
+                f'{"--shared" if cloneAsShared else ""} {repository} {wwwDir}')
 
         # Symbolic link
         if os.path.islink(linkDir):
@@ -181,7 +186,6 @@ class Workplace(object):
 
         # Creating, fetch, pulling branches
         repo.fetch(C.get('upstreamRemote'))
-        branch = stableBranch(version)
         track = '%s/%s' % (C.get('upstreamRemote'), branch)
         if not repo.hasBranch(branch) and not repo.createBranch(branch, track):
             logging.error('Could not create branch %s tracking %s' % (branch, track))
@@ -191,7 +195,7 @@ class Workplace(object):
 
         # Fixing up remote URLs if need be, this is done after pulling the cache one because we
         # do not want to contact the real origin server from here, it is slow and pointless.
-        if not C.get('useCacheAsUpstreamRemote'):
+        if not useCacheAsUpstream:
             realupstream = C.get('remotes.integration') if integration else C.get('remotes.stable')
             if realupstream:
                 repo.setRemote(C.get('upstreamRemote'), realupstream)

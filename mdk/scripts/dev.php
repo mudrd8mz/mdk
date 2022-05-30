@@ -25,6 +25,9 @@ mdk_set_config('debug', DEBUG_DEVELOPER);
 // Display debug messages.
 mdk_set_config('debugdisplay', 1);
 
+// Increase session lifetime to forever.
+mdk_set_config('sessiontimeout', 52 * WEEKSECS);
+
 // Any kind of password is allowed.
 mdk_set_config('passwordpolicy', 0);
 
@@ -75,5 +78,19 @@ if (is_readable($configpath)) {
         $before = "require_once(__DIR__ . '/lib/setup.php');";
         $newconfig = str_replace($before, $insert . PHP_EOL . $before, $configfile);
         file_put_contents($configpath, $newconfig);
+    }
+}
+
+// Adds moodle_database declaration to help VSCode detect moodle_database.
+$varmoodledb = '/** @var moodle_database */
+$DB = $DB;
+';
+$conffile = dirname(__FILE__) . '/config.php';
+if ($content = file_get_contents($conffile)) {
+    if (strpos($content, "@var moodle_database") === false) {
+        if ($f = fopen($conffile, 'a')) {
+            fputs($f, $varmoodledb);
+            fclose($f);
+        }
     }
 }
