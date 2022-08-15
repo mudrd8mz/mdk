@@ -83,7 +83,7 @@ if (is_readable($configpath)) {
 
 // Adds moodle_database declaration to help VSCode detect moodle_database.
 $varmoodledb = '/** @var moodle_database */
-$DB = $DB;
+$DB = isset($DB) ? $DB : null;
 ';
 $conffile = dirname(__FILE__) . '/config.php';
 if ($content = file_get_contents($conffile)) {
