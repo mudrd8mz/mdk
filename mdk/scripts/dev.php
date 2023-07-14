@@ -81,6 +81,9 @@ if (is_readable($configpath)) {
     }
 }
 
+// Disabling user tours.
+$DB->set_field('tool_usertours_tours', 'enabled', 0);
+
 // Adds moodle_database declaration to help VSCode detect moodle_database.
 $varmoodledb = '/** @var moodle_database */
 $DB = isset($DB) ? $DB : null;
