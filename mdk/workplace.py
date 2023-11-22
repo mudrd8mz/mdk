@@ -114,7 +114,7 @@ class Workplace(object):
                 logging.info('Have a break, this operation is slow...')
                 process('%s clone --mirror %s %s' % (C.get('git'), C.get('remotes.integration'), cacheIntegration))
 
-    def create(self, name=None, version='master', integration=False, useCacheAsRemote=False):
+    def create(self, name=None, version='main', integration=False, useCacheAsRemote=False):
         """Creates a new instance of Moodle.
         The parameter useCacheAsRemote has been deprecated.
         """
@@ -130,7 +130,7 @@ class Workplace(object):
         extraDir = self.getPath(name, 'extra')
         linkDir = os.path.join(self.www, name)
         extraLinkDir = os.path.join(self.getMdkWebDir(), name)
-        branch = stableBranch(version)
+        branch = stableBranch(version, git.Git(self.getCachedRemote(integration), C.get('git')))
 
         useCacheAsUpstream = C.get('useCacheAsUpstreamRemote')
         cloneAsShared = useCacheAsUpstream and C.get('useCacheAsSharedClone')
@@ -243,8 +243,23 @@ class Workplace(object):
             name = identifier.replace(' ', '_')
         else:
             # Wording version
+            prefixmaster = C.get('wording.prefixMaster')
             if version == 'master':
-                prefixVersion = C.get('wording.prefixMaster')
+                prefixVersion = prefixmaster
+            elif version == 'main':
+                prefixmain = C.get('wording.prefixMain')
+                # Check if we need to sync master and main prefix wordings. Should be a one-off thing.
+                if not C.get('wordingPrefixesChecked'):
+                    # If wording.prefixMaster has been customised while wording.prefixMain remains default,
+                    # copy wording.prefixMaster to wording.prefixMain to maintain customisation.
+                    if prefixmaster != 'master' and prefixmain == 'main':
+                        prefixmain = prefixmaster
+                        C.set('wording.prefixMain', prefixmain)
+                        logging.info('The config wording.prefixMaster (%s) has been copied to wording.prefixMain'
+                                     % prefixmain)
+                    # Set config wordingPrefixesChecked to true. We shouldn't need to do this next time.
+                    C.set('wordingPrefixesChecked', True)
+                prefixVersion = prefixmain
             else:
                 prefixVersion = version
 

@@ -218,11 +218,21 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in _nsre.split(s)]
 
 
-def stableBranch(version):
-    if version == 'master':
-        return 'master'
+def stableBranch(version, git=None):
+    if version in ['master', 'main']:
+        if git is not None and not git.hasBranch('main', C.get('upstreamRemote')):
+            # Fall back to master if main is not yet available.
+            logging.info('The main branch has not been found, using master instead.')
+            return 'master'
+        return 'main'
     return 'MOODLE_%d_STABLE' % int(version)
 
+
+def version_options():
+    return ([str(x) for x in range(13, 40)]
+            + [str(x) for x in range(310, 312)]
+            + [str(x) for x in range(400, C.get('masterBranch'))]
+            + ['master', 'main'])
 
 class ProcessInThread(threading.Thread):
     """Executes a process in a separate thread"""

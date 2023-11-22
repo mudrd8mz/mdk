@@ -1,6 +1,34 @@
 Changelog
 =========
 
+v2.0.12
+-----
+
+- Update `master` and `main` tracker field names to point to the renamed `Pull Main xx` fields
+- `tools.stableBranch` should be checking for the `main` branch at the remote
+- Make sure to sync `master` to `main` during `mdk update` of master/main instances
+- Check for customised `wording.prefixMaster` and sync `wording.prefixMain` if necessary
+
+v2.0.11
+-----
+
+- Fix rendering of correct version options for the `backport`, `create`, and `rebase` commands - Jun Pataleta
+- Include VScode setting to autoformat with yapf
+- Add support for Moodle's `main` branch - Jun Pataleta
+
+v2.0.10
+-----
+
+- Fixed typo for the 403 entry in `config-dist.json` - Jun Pataleta
+
+v2.0.9
+-----
+
+- Disable user tours when running `dev` and `mindev` scripts
+- Make use of GitHub whitespace ignore parameter in push URLs - Andrew Lyons
+- Remove `--dev` arg from composer install - Andrew Lyons
+- Update config for Moodle 4.4 development
+
 v2.0.8
 ------
 
