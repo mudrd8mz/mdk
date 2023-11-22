@@ -1,6 +1,12 @@
-This is how I install the custom-scripts version locally. Doing this after
+This is how I install the custom-scripts version locally. Do this after
 updating mdk from upstream.
+
+I have mdk installed in a virtual environment
 
     $ cd ~/git/mdk
 
-    $ pip install --user .
+    $ source ~/bin/mdkenv/bin/activate
+
+    $ pip install .
+
+    $ deactivate
