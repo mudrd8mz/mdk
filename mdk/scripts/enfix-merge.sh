@@ -5,7 +5,7 @@ set -e
 AMOSCLI="/home/mudrd8mz/www/html/langmoodleorg/local/amos/cli"
 ENFIXROOT="/home/mudrd8mz/tmp/export-enfix"
 DIRROOT=$(mdk info -v path)
-BRANCH=$(php -r 'define("MOODLE_INTERNAL", 1); @require("version.php"); echo $branch;')
+BRANCH=$(sed -n "s/\$branch   = '\(.*\)';.*/\1/p" version.php)
 TMPDIR=tmp
 PHP=/usr/bin/php
 LOG=enfix.log
