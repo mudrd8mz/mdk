@@ -106,66 +106,6 @@
         "username": false,
         "fieldnames" : {
             "repositoryurl" : "Pull  from Repository",
-            "27" : {
-                "branch" : "Pull 2.7 Branch",
-                "diffurl" : "Pull 2.7 Diff URL"
-            },
-            "29" : {
-                "branch" : "Pull 2.9 Branch",
-                "diffurl" : "Pull 2.9 Diff URL"
-            },
-            "30" : {
-                "branch" : "Pull 3.0 Branch",
-                "diffurl" : "Pull 3.0 Diff URL"
-            },
-            "31" : {
-                "branch" : "Pull 3.1 Branch",
-                "diffurl" : "Pull 3.1 Diff URL"
-            },
-            "32" : {
-                "branch" : "Pull 3.2 Branch",
-                "diffurl" : "Pull 3.2 Diff URL"
-            },
-            "33" : {
-                "branch" : "Pull 3.3 Branch",
-                "diffurl" : "Pull 3.3 Diff URL"
-            },
-            "34" : {
-                "branch" : "Pull 3.4 Branch",
-                "diffurl" : "Pull 3.4 Diff URL"
-            },
-            "35" : {
-                "branch" : "Pull 3.5 Branch",
-                "diffurl" : "Pull 3.5 Diff URL"
-            },
-            "36" : {
-                "branch" : "Pull 3.6 Branch",
-                "diffurl" : "Pull 3.6 Diff URL"
-            },
-            "37" : {
-                "branch" : "Pull 3.7 Branch",
-                "diffurl" : "Pull 3.7 Diff URL"
-            },
-            "38" : {
-                "branch" : "Pull 3.8 Branch",
-                "diffurl" : "Pull 3.8 Diff URL"
-            },
-            "39" : {
-                "branch" : "Pull 3.9 Branch",
-                "diffurl" : "Pull 3.9 Diff URL"
-            },
-            "310" : {
-                "branch" : "Pull 3.10 Branch",
-                "diffurl" : "Pull 3.10 Diff URL"
-            },
-            "311" : {
-                "branch" : "Pull 3.11 Branch",
-                "diffurl" : "Pull 3.11 Diff URL"
-            },
-            "400" : {
-                "branch" : "Pull 4.0 Branch",
-                "diffurl" : "Pull 4.0 Diff URL"
-            },
             "401" : {
                 "branch" : "Pull 4.1 Branch",
                 "diffurl" : "Pull 4.1 Diff URL"
@@ -177,6 +117,10 @@
             "403" : {
                 "branch" : "Pull 4.3 Branch",
                 "diffurl" : "Pull 4.3 Diff URL"
+            },
+            "404" : {
+                "branch" : "Pull 4.4 Branch",
+                "diffurl" : "Pull 4.4 Diff URL"
             },
             "main" : {
                 "branch" : "Pull Main Branch",
@@ -263,7 +207,10 @@
         // behat wwwroot is the host, nothing else. Use a ServerAlias or /etc/hosts entries.
         "host": "127.0.0.1",
         // The number of seconds the behat command will sleep after launching the PHP Server, or Selenium.
-        "launchSleep": 5
+        "launchSleep": 5,
+        // By default MDK will use the Selenium server 3.x.x for Behat test. Enable this setting will make
+        // MDK to use the new Selenium Grid.
+        "useSeleniumGrid": false
     },
 
     // PHPUnit related settings
@@ -332,7 +279,7 @@
     "useCacheAsSharedClone": false,
 
     // You should not edit this, this is the branch that is considered as master by developers.
-    "masterBranch": 404,
+    "masterBranch": 405,
 
     // Aliases for MDK commands.
     // An alias starting with a ! will be executed through the command line. Those also
