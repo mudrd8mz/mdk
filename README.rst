@@ -26,6 +26,56 @@ Get some help on a command using::
 
 Also check the `wiki <https://github.com/FMCorz/mdk/wiki>`_.
 
+Docker support
+==============
+
+As at MDK 2.1, partial support for Moodle running in Docker is available. Some commands like ``phpunit``, ``upgrade``, ``run``, ``cron`` are run in the container. The ``behat`` command can also work but still requires some fiddling around. Other commands such as ``install`` will not work.
+
+Set the environment variable ``MDK_DOCKER_NAME`` to the name of the running container, or enable the config ``docker.automaticContainerLookup`` to let MDK look for a matching running container automatically.
+
+Usage examples::
+
+    # One command.
+    $ MDK_DOCKER_NAME=sm mdk phpunit
+
+    # Multiple commands.
+    $ set -x MDK_DOCKER_NAME sm
+    $ mdk run dev
+    $ mdk phpunit
+
+    # Enable automatic resolution.
+    $ mdk config set docker.automaticContainerLookup true
+
+    # With automatic resolution.
+    $ cd /path/to/sm
+    $ mdk phpunit
+
+Compatible containers
+---------------------
+
+The Docker container must be created using `moodlehq/moodle-php-apache <https://github.com/moodlehq/moodle-php-apache>`_, here is an example::
+
+    # Replace `sm` with the name of your instance.
+    set -x INSTANCE_NAME sm
+
+    # This computes the paths of the instance.
+    set -x MDK_INSTANCE_DIR (mdk info -v path $INSTANCE_NAME)
+    set -x MDK_STORAGE_DIR (mdk config show dirs.storage | python -c 'import sys, pathlib; print(pathlib.Path(sys.stdin.read()).expanduser().resolve(), end="")')
+
+    # Create a Docker network called `moodle`.
+    docker network create moodle 2> /dev/null
+
+    # Create and start the docker container, change the port, name and PHP version as needed.
+    docker run -d \
+        --name $INSTANCE_NAME \
+        --network moodle \
+        -v $MDK_INSTANCE_DIR:/var/www/html \
+        -v $MDK_STORAGE_DIR/$INSTANCE_NAME/moodledata:/var/www/moodledata \
+        -v $MDK_STORAGE_DIR/$INSTANCE_NAME/extra/behat:/var/www/behatfaildumps \
+        -p 8800:80 moodlehq/moodle-php-apache:8.1
+
+You will want to create databases in the same network, and other services like selenium.
+
 Installation
 ============
 
@@ -145,11 +195,11 @@ Backup a whole instance so that it can be restored later.
 
 **Examples**
 
-Backup the instance named stable_master
+Backup the instance named stable_main
 
 ::
 
-    mdk backup stable_master
+    mdk backup stable_main
 
 List the backups
 
@@ -157,11 +207,11 @@ List the backups
 
     mdk backup --list
 
-Restore the second backup of the instance stable_master
+Restore the second backup of the instance stable_main
 
 ::
 
-    mdk backup --restore stable_master_02
+    mdk backup --restore stable_main_02
 
 
 behat
@@ -263,11 +313,11 @@ List the instances
 
     mdk info --list
 
-Display the information known about the instance *stable_master*
+Display the information known about the instance *stable_main*
 
 ::
 
-    mdk info stable_master
+    mdk info stable_main
 
 
 install
@@ -279,7 +329,7 @@ Run the command line installation script with all parameters set on an existing 
 
 ::
 
-    mdk install --engine mysqli stable_master
+    mdk install --engine mysqli stable_main
 
 
 js
@@ -392,12 +442,12 @@ Fetch the latest branches from the upstream remote and rebase your local branche
 
 **Examples**
 
-This will rebase the branches MDL-12345-xx and MDL-56789-xx on the instances stable_22, stable_23 and stable_master. And push them to your remote if successful.
+This will rebase the branches MDL-12345-xx and MDL-56789-xx on the instances stable_22, stable_23 and stable_main. And push them to your remote if successful.
 
 ::
 
-    mdk rebase --issues 12345 56789 --version 22 23 master --push
-    mdk rebase --issues MDL-12345 MDL-56789 --push stable_22 stable_23 stable_master
+    mdk rebase --issues 12345 56789 --version 22 23 main --push
+    mdk rebase --issues MDL-12345 MDL-56789 --push stable_22 stable_23 stable_main
 
 
 remove
@@ -409,7 +459,7 @@ Remove an instance, deleting every thing including the database.
 
 ::
 
-    mdk remove stable_master
+    mdk remove stable_main
 
 
 run
@@ -419,11 +469,11 @@ Execute a script on an instance. The scripts are stored in the scripts directory
 
 **Example**
 
-Set the instance stable_master ready for development
+Set the instance stable_main ready for development
 
 ::
 
-    mdk run dev stable_master
+    mdk run dev stable_main
 
 
 tracker
@@ -503,11 +553,11 @@ You can write custom scripts and execute them on your instances using the comman
 ::
 
     # From anywhere on the system
-    $ mdk run helloworld stable_master
+    $ mdk run helloworld stable_main
 
     # Is similar to typing the following command
-    $ cp /path/to/script/helloworld.php /path/to/moodle/instances/stable_master
-    $ cd /path/to/moodle/instances/stable_master
+    $ cp /path/to/script/helloworld.php /path/to/moodle/instances/stable_main
+    $ cd /path/to/moodle/instances/stable_main
     $ php helloworld.php
 
 Scripts are very handy when it comes to performing more complexed tasks.
