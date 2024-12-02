@@ -1,3 +1,4 @@
+setuptools
 keyring>=3.5
 keyrings.alt>=4.0.2
 jenkinsapi>=0.3.2
