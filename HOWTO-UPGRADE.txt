@@ -10,3 +10,10 @@ I have mdk installed in a virtual environment
     $ pip install .
 
     $ deactivate
+
+
+To re-create the virtual environment:
+
+    $ cd ~/bin/mdkenv
+
+    $ python3 -m venv .
