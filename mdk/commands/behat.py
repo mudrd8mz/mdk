@@ -44,10 +44,18 @@ class BehatCommand(Command):
             },
         ),
         (
+            ['-R', '--rerun'],
+            {
+                'action': 'store_true',
+                'help': 're-run scenarios that failed during last execution, implies --run.',
+            },
+        ),
+        (
             ['-d', '--disable'],
             {
                 'action': 'store_true',
-                'help': 'disable Behat, runs the tests first if --run has been set. Ignored from 2.7.'
+                'help': 'disable Behat, runs the tests first if --run has been set. Ignored from 2.7.',
+                'silent': True,
             },
         ),
         (
@@ -72,6 +80,13 @@ class BehatCommand(Command):
                 'dest': 'testname',
                 'metavar': 'name',
                 'help': 'only execute the feature elements which match part of the given name or regex'
+            },
+        ),
+        (
+            ['-p', '--profile'],
+            {
+                'metavar': 'profile',
+                'help': 'the profile to use for running the tests, refers to $CFG->behat_profiles.'
             },
         ),
         (
@@ -154,6 +169,7 @@ class BehatCommand(Command):
 
     def run(self, args):
         withselenium = not (args.noselenium or args.nojavascript)
+        shouldrun = args.run or args.rerun
 
         # Loading instance
         M = self.Wp.resolve(args.name)
@@ -222,6 +238,9 @@ class BehatCommand(Command):
 
             # Preparing Behat command
             cmd = ['vendor/bin/behat']
+            if args.profile:
+                cmd.append('--profile=%s' % (args.profile))
+
             if args.tags:
                 cmd.append('--tags=%s' % (args.tags))
 
@@ -230,6 +249,9 @@ class BehatCommand(Command):
 
             if not (args.tags or args.testname) and nojavascript:
                 cmd.append('--tags ~@javascript')
+
+            if args.rerun:
+                cmd.append('--rerun')
 
             if args.faildump:
                 if M.branch_compare(31, '<'):
@@ -263,7 +285,7 @@ class BehatCommand(Command):
                 else:
                     seleniumCommand = '%s -jar %s' % (self.C.get('java'), seleniumPath)
 
-            if args.run:
+            if shouldrun:
                 logging.info('Preparing Behat testing')
 
                 # Launching Selenium
