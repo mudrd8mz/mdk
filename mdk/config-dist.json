@@ -114,7 +114,7 @@
 
     // The information for integrating MDK with Jira
     "tracker": {
-        "url": "https://tracker.moodle.org/",
+        "url": "https://moodle.atlassian.net/",
         "username": false,
         "fieldnames" : {
             "repositoryurl" : "Pull  from Repository",
@@ -257,16 +257,6 @@
     "php": "/usr/bin/php",
     // Path to Java
     "java": "/usr/bin/java",
-    // Path to Grunt
-    "grunt": "/usr/local/bin/grunt",
-    // Path to recess
-    "recess": "/usr/local/bin/recess",
-    // Path to lessc
-    "lessc": "/usr/local/bin/lessc",
-    // Path to shifter
-    "shifter": "/usr/bin/shifter",
-    // Path to yuidoc
-    "yuidoc": "/usr/local/bin/yuidoc",
     // Path to your favourite editor. Set to null to guess it from the System environment.
     "editor": null,
 
@@ -307,7 +297,23 @@
         // When enabled, this will automatically attempt to find the container in which an instance
         // is running based on the instance name, and the running containers. This will only apply
         // when environment variable `MDK_DOCKER_NAME` is not set.
-        "automaticContainerLookup": false
+        "automaticContainerLookup": false,
+
+        // The name of the Docker network to use.
+        "network": "moodle"
+    },
+
+    // Adminer settings.
+    "adminer": {
+
+        // The local port to use.
+        "port": 9100,
+
+        // The Docker image.
+        "image": "adminer:latest",
+
+        // The container name.
+        "name": "adminer"
     },
 
     // Aliases for MDK commands.

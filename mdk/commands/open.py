@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Moodle Development Kit
 
-Copyright (c) 2012 Frédéric Massart - FMCorz.net
+Copyright (c) 2025 Frédéric Massart
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,4 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 http://github.com/FMCorz/mdk
 """
 
-__version__ = "2.1.4"
+import logging
+
+from mdk.tools import open_in_browser
+
+from ..command import Command
+
+logger = logging.getLogger(__name__)
+
+
+class OpenCommand(Command):
+
+    _description = "Opens an instance in the browser"
+
+    def setup_args(self, parser):
+        parser.add_argument('instance', nargs='?', help='name of the instance')
+
+    def run(self, args):
+        M = self.Wp.resolve(args.instance, raise_exception=True)
+        if not M.isInstalled():
+            raise Exception(f'Moodle instance {M.get("identifier")} is not installed.')
+        wwwroot = M.get('wwwroot')
+        open_in_browser(wwwroot)

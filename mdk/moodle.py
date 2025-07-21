@@ -194,9 +194,22 @@ class Moodle(object):
         # Ensure path is relative.
         if cli.startswith(self.path):
             cli = cli[len(self.path):]
+
         cli = cli.lstrip('/')
 
+        branch = self.get('branch')
+
+        if self.branch_compare(501, '>='):
+            # From Moodle 5.1 onwards, Moodle moves to a public directory.
+            # Initially all content is moved there, but it will gradually move out.
+            if not self.container.exists(Path(cli)):
+                if not cli.startswith('public') and self.container.exists(Path('public/version.php')):
+                    if self.container.exists(Path('public', cli)):
+                        # If the version.php is in the public directory, we need to run the script from there.
+                        cli = os.path.join('public', cli)
+
         if not self.container.exists(Path(cli)):
+            # If the version.php is in the public directory, we need to run the script from there.
             raise Exception('Could not find script to call')
 
         args = args or []
@@ -426,7 +439,7 @@ class Moodle(object):
             raise InstallException('Instance already installed!')
 
         if not wwwroot:
-            raise InstallException('Cannot install without a value for wwwroot')
+            wwwroot = self.container.wwwroot
         if dataDir == None or not os.path.isdir(dataDir):
             raise InstallException('Cannot install instance without knowing where the data directory is')
         if dbname == None:
@@ -555,15 +568,32 @@ class Moodle(object):
         return self.installed == True
 
     @staticmethod
+    def getVersionPath(path):
+        versionFiles = [
+            os.path.join(path, 'version.php'),
+            os.path.join(path, 'public', 'version.php'),
+        ]
+
+        for versionFile in versionFiles:
+            if os.path.isfile(versionFile):
+                return versionFile
+
+        raise Exception('This does not appear to be a Moodle instance')
+
+    @staticmethod
     def isInstance(path):
         """Check whether the path is a Moodle web directory"""
-        version = os.path.join(path, 'version.php')
+        version = Moodle.getVersionPath(path)
         try:
             f = open(version, 'r')
             lines = f.readlines()
             f.close()
         except:
+            pass
+
+        if not lines:
             return False
+
         found = False
         for line in lines:
             if line.find('MOODLE VERSION INFORMATION') > -1:
@@ -598,45 +628,41 @@ class Moodle(object):
 
         # Extracts information from version.php
         self.version = {}
-        version = os.path.join(self.path, 'version.php')
-        if os.path.isfile(version):
 
-            reVersion = re.compile(r'^\s*\$version\s*=\s*([0-9.]+)\s*;')
-            reRelease = re.compile(r'^\s*\$release\s*=\s*(?P<brackets>[\'"])?(.+)(?P=brackets)\s*;')
-            reMaturity = re.compile(r'^\s*\$maturity\s*=\s*([a-zA-Z0-9_]+)\s*;')
-            reBranch = re.compile(r'^\s*\$branch\s*=\s*(?P<brackets>[\'"])?([0-9]+)(?P=brackets)\s*;')
+        version = Moodle.getVersionPath(self.path)
+        reVersion = re.compile(r'^\s*\$version\s*=\s*([0-9.]+)\s*;')
+        reRelease = re.compile(r'^\s*\$release\s*=\s*(?P<brackets>[\'"])?(.+)(?P=brackets)\s*;')
+        reMaturity = re.compile(r'^\s*\$maturity\s*=\s*([a-zA-Z0-9_]+)\s*;')
+        reBranch = re.compile(r'^\s*\$branch\s*=\s*(?P<brackets>[\'"])?([0-9]+)(?P=brackets)\s*;')
 
-            f = open(version, 'r')
-            for line in f:
-                if reVersion.search(line):
-                    self.version['version'] = reVersion.search(line).group(1)
-                elif reRelease.search(line):
-                    self.version['release'] = reRelease.search(line).group(2)
-                elif reMaturity.search(line):
-                    self.version['maturity'] = reMaturity.search(line).group(1).replace('MATURITY_', '').lower()
-                elif reBranch.search(line):
-                    self.version['branch'] = reBranch.search(line).group(2)
+        f = open(version, 'r')
+        for line in f:
+            if reVersion.search(line):
+                self.version['version'] = reVersion.search(line).group(1)
+            elif reRelease.search(line):
+                self.version['release'] = reRelease.search(line).group(2)
+            elif reMaturity.search(line):
+                self.version['maturity'] = reMaturity.search(line).group(1).replace('MATURITY_', '').lower()
+            elif reBranch.search(line):
+                self.version['branch'] = reBranch.search(line).group(2)
 
-            # Several checks about the branch
-            try:
-                # Has it been set?
-                branch = self.version['branch']
-            except:
-                self.version['branch'] = self.version['release'].replace('.', '')[0:2]
-                branch = self.version['branch']
-            if int(branch) >= int(C.get('masterBranch')):
-                self.version['branch'] = 'main'
+        # Several checks about the branch
+        try:
+            # Has it been set?
+            branch = self.version['branch']
+        except:
+            self.version['branch'] = self.version['release'].replace('.', '')[0:2]
+            branch = self.version['branch']
+        if int(branch) >= int(C.get('masterBranch')):
+            self.version['branch'] = 'main'
 
-            # Stable branch
-            self.version['stablebranch'] = stableBranch(self.version['branch'], self.git())
+        # Stable branch
+        self.version['stablebranch'] = stableBranch(self.version['branch'], self.git())
 
-            # Integration or stable?
-            self.version['integration'] = self.isIntegration()
+        # Integration or stable?
+        self.version['integration'] = self.isIntegration()
 
-            f.close()
-        else:
-            # Should never happen
-            raise Exception('This does not appear to be a Moodle instance')
+        f.close()
 
         # Extracts parameters from config.php, does not handle params over multiple lines
         self.config = {}

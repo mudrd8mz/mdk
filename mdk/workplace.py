@@ -209,8 +209,11 @@ class Workplace(object):
         # Instantiating the object also checks if it exists
         M = self.get(name)
 
-        # Deleting the whole thing
-        shutil.rmtree(os.path.join(self.path, name))
+        # Delete DB.
+        DB = M.dbo()
+        dbname = M.get('dbname')
+        if DB and dbname and DB.dbexists(dbname):
+            DB.dropdb(dbname)
 
         # Deleting the possible symlink
         link = os.path.join(self.www, name)
@@ -228,11 +231,8 @@ class Workplace(object):
             except Exception:
                 pass
 
-        # Delete db
-        DB = M.dbo()
-        dbname = M.get('dbname')
-        if DB and dbname and DB.dbexists(dbname):
-            DB.dropdb(dbname)
+        # Deleting the whole thing
+        shutil.rmtree(os.path.join(self.path, name))
 
     def generateInstanceName(self, version, integration=False, suffix='', identifier=None):
         """Creates a name (identifier) from arguments"""
@@ -377,7 +377,14 @@ class Workplace(object):
             names.append(d)
         return names
 
-    def resolve(self, name=None, path=None) -> Optional[moodle.Moodle]:
+    def resolve(self, name=None, path=None, raise_exception=False) -> Optional[moodle.Moodle]:
+        """Try to find a Moodle instance based on its name, a path or the working directory"""
+        M = self._resolve(name=name, path=path)
+        if M is None and raise_exception:
+            raise Exception('Could not find a Moodle instance.')
+        return M
+
+    def _resolve(self, name=None, path=None) -> Optional[moodle.Moodle]:
         """Try to find a Moodle instance based on its name, a path or the working directory"""
 
         # A name was passed, is that a valid instance?

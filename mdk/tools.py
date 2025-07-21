@@ -33,9 +33,15 @@ import getpass
 import logging
 import hashlib
 import tempfile
+from webbrowser import open_new_tab
+from typing import Optional
 from .config import Conf
 
 C = Conf()
+
+
+def open_in_browser(url):
+    open_new_tab(url)
 
 
 def yesOrNo(q):
@@ -75,6 +81,11 @@ def chmodRecursive(path, chmod):
         for f in filenames:
             file = os.path.join(dirpath, f)
             os.chmod(file, chmod)
+
+
+def get_major_version_from_release(release: str) -> Optional[str]:
+    """Get the major version (3.11, 5.0) from a release string."""
+    return re.sub(r'^(\d+\.\d+).*$', r'\1', '.'.join(release.split('.')[:2]))
 
 
 def getMDLFromCommitMessage(message):
@@ -237,10 +248,9 @@ def stableBranch(version, git=None):
 
 
 def version_options():
-    return ([str(x) for x in range(13, 40)]
-            + [str(x) for x in range(310, 312)]
-            + [str(x) for x in range(400, C.get('masterBranch'))]
-            + ['master', 'main'])
+    return ([str(x) for x in range(13, 40)] + [str(x) for x in range(310, 312)] +
+            [str(x) for x in range(400, C.get('masterBranch'))] + ['master', 'main'])
+
 
 class ProcessInThread(threading.Thread):
     """Executes a process in a separate thread"""

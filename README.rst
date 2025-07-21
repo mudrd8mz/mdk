@@ -53,28 +53,36 @@ Usage examples::
 Compatible containers
 ---------------------
 
-The Docker container must be created using `moodlehq/moodle-php-apache <https://github.com/moodlehq/moodle-php-apache>`_, here is an example::
+The Docker container must be created using `moodlehq/moodle-php-apache <https://github.com/moodlehq/moodle-php-apache>`_, with MDK::
 
-    # Replace `sm` with the name of your instance.
-    set -x INSTANCE_NAME sm
+    # From the instance directory.
+    mdk docker up --port 8800 --php 8.2
 
-    # This computes the paths of the instance.
-    set -x MDK_INSTANCE_DIR (mdk info -v path $INSTANCE_NAME)
-    set -x MDK_STORAGE_DIR (mdk config show dirs.storage | python -c 'import sys, pathlib; print(pathlib.Path(sys.stdin.read()).expanduser().resolve(), end="")')
+    # From anywhere when the container already exists.
+    mdk docker up sm
 
-    # Create a Docker network called `moodle`.
-    docker network create moodle 2> /dev/null
+    # To start the default docker Postgres instance
+    mdk docker db up pgsql-docker
 
-    # Create and start the docker container, change the port, name and PHP version as needed.
-    docker run -d \
-        --name $INSTANCE_NAME \
-        --network moodle \
-        -v $MDK_INSTANCE_DIR:/var/www/html \
-        -v $MDK_STORAGE_DIR/$INSTANCE_NAME/moodledata:/var/www/moodledata \
-        -v $MDK_STORAGE_DIR/$INSTANCE_NAME/extra/behat:/var/www/behatfaildumps \
-        -p 8800:80 moodlehq/moodle-php-apache:8.1
+You may create the containers manually but MDK handles the volumes, the network, and other details.
 
-You will want to create databases in the same network, and other services like selenium.
+Create & install flow
+---------------------
+
+To create a new instance and install it::
+
+    set -x MDK_DOCKER_NAME example
+    mdk create --identifier example
+    mdk docker up --port 8800 example
+    mdk install --engine pgsql-docker example
+    mdk open example
+
+To remove it completely::
+
+    mdk docker down example
+    mdk remove example
+
+The environment variable ``MDK_DOCKER_NAME`` can be omitted when the config ``docker.automaticContainerLookup`` is set to true.
 
 PHP executable
 ==============
@@ -148,11 +156,11 @@ Clone the repository::
 
 On Debian-based systems, you will need to install the following packages::
 
-    sudo apt-get install python-pip libmysqlclient-dev libpq-dev python-dev unixodbc-dev
+    sudo apt-get install python3-pip libmysqlclient-dev libpq-dev python3-dev unixodbc-dev
 
 Then from the directory where you cloned the repository::
 
-    python setup.py develop --user
+    pip3 install --user -e . --break-system-packages
     mdk init
 
 
@@ -164,7 +172,7 @@ Fish completion
 
 To activate fish completion::
 
-    sudo ln -s /path/to/moodle-sdk/extra/fish_completion ~/config/fish/completions/mdk.fish
+    sudo ln -s /path/to/moodle-sdk/extra/fish_completion.fish ~/.config/fish/completions/mdk.fish
 
 Bash completion
 ^^^^^^^^^^^^^^^
@@ -507,7 +515,7 @@ Gets some information about the issue on the tracker.
     ------------------------------------------------------------------------
       MDL-34543: New assignment module - Feedback file exists for an
         assignment but not shown in the Feedback files picker
-      Bug - Critical - https://tracker.moodle.org/browse/MDL-34543
+      Bug - Critical - https://moodle.atlassian.net/browse/MDL-34543
       Closed (Fixed) 2012-08-17 07:25
     -------------------------------------------------------[ V: 7 - W: 7 ]--
     Reporter            : Paul Hague (paulhague) on 2012-07-26 08:30
