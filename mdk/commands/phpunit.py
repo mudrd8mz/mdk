@@ -88,6 +88,14 @@ class PhpunitCommand(Command):
             },
         ),
         (
+            ['-w', '--display-warnings'],
+            {
+                'action': 'store_true',
+                'dest': 'displaywarnings',
+                'help': 'display details on tests that triggered warnings (From 5.0)'
+            },
+        ),
+        (
             ['-c', '--coverage'],
             {
                 'action': 'store_true',
@@ -162,9 +170,10 @@ class PhpunitCommand(Command):
             'filter': args.filter,
             'testcase': args.testcase,
             'testsuite': testsuite,
-            'unittest': args.unittest,
+            'unittest': str(M.get_file_path(args.unittest)) if args.unittest else None,
             'stopon': [] if not args.stoponfailure else ['failure'],
-            'repeat': repeat
+            'repeat': repeat,
+            'display': ['warnings'] if args.displaywarnings and M.branch_compare(500) else None
         }
 
         if args.run:

@@ -35,8 +35,9 @@
 
 # Go to instance directory.
 function gt() {
-    DIR=`mdk config show dirs.www`
-    eval DIR="$DIR/$1"
+    DIR=`mdk config show dirs.storage`
+    WWWDIR=`mdk config show wwwDir`
+    eval DIR="$DIR/$1/$WWWDIR"
     if [[ ! -d $DIR ]]; then
         echo "Could not resolve path"
         return

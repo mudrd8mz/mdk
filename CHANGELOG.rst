@@ -1,6 +1,31 @@
 Changelog
 =========
 
+v2.1.6
+-----
+
+- `phpunit` command supports native `--display-warnings` argument
+- `docker logs` supports following the logs of an instance
+- Improved and fixed file path resolution accounting for new `public/` folder
+- Fixed a bug where `docker up` wrongly assumed an instance was installed
+- Fixed a bug where deleting an instance expected it to be installed first
+- Symbolic links now target the `public/` folder if it exists
+- Updated `gt` command to correctly navigate to the root folder
+- Added `gt` and `gtd` shortcuts for Fish shell
+- `gt` command for Fish can navigate directly to a specified component folder
+- Upgraded `docker selenium` to use images version 4 and recommended shared memory
+- Support for Moodle 5.2 development
+
+v2.1.5
+-----
+
+- Support for scripts affected by the code restructure for 5.1 and up (MDL-83424). - Andrew Lyons
+- New `docker` commands to manage docker containers.
+- Remove unused nginx conf file.
+- Update dev install instructions.
+- Use emoji to avoid escaping issues due to slashes.
+- New `open` command to open an instance on the browser.
+
 v2.1.4
 -----
 
