@@ -2,7 +2,7 @@
 
 set -e
 
-AMOSCLI="/home/mudrd8mz/www/html/langmoodleorg/local/amos/cli"
+AMOSCLI="/home/mudrd8mz/www/html/langmoodleorg/public/local/amos/cli"
 ENFIXROOT="/home/mudrd8mz/tmp/export-enfix"
 DIRROOT=$(mdk info -v path)
 if [[ -f version.php ]]; then
