@@ -49,6 +49,7 @@ class DockerCommand(Command):
 
         # Up, down, rm, stop.
         upparser = subparser.add_parser('up', parents=[parent], help='create and start Moodle in a container')
+        upparser.add_argument('-o', '--open', action='store_true', help='open the instance in the browser')
         upparser.add_argument('-p', '--port', metavar='port', type=int, help='the local port to use')
         upparser.add_argument(
             '-v',
@@ -60,6 +61,7 @@ class DockerCommand(Command):
         )
         upparser.add_argument('-N', '--no-create', action='store_true', help='do not create the container if it does not exist')
         upparser.add_argument('--xdebug', action='store_true', help='enable the Xdebug extension in the container')
+        upparser.add_argument('--xhprof', action='store_true', help='enable the Xhprof extension in the container')
 
         downparser = subparser.add_parser('down', parents=[parent], help='stop and remove the Moodle container')
         rmparser = subparser.add_parser('rm', parents=[parent], help='remove the Moodle container')
@@ -152,13 +154,21 @@ class DockerCommand(Command):
         dockername = M.identifier
         dockernet = self.C.get('docker.network')
 
+        def open_instance_in_browser_if_needed():
+            if not args.open:
+                return
+            M = self.Wp.resolve(args.instance, raise_exception=True)
+            open_in_browser(M.get('wwwroot'))
+
         if is_docker_container_running(dockername):
             logging.info(f'The container "{dockername}" is already running.')
+            open_instance_in_browser_if_needed()
             return
 
         elif docker_container_exists(dockername):
             logging.info(f'Starting existing container "{dockername}".')
             process(['docker', 'start', dockername])
+            open_instance_in_browser_if_needed()
             return
 
         elif args.no_create:
@@ -193,6 +203,9 @@ class DockerCommand(Command):
             envvars['PHP_INI-xdebug.client_host'] = 'host.docker.internal'
             envvars['PHP_INI-xdebug.mode'] = 'develop,debug'
             envvars['PHP_INI-xdebug.start_with_request'] = 'yes'
+        if args.xhprof:
+            envvars['PHP_EXTENSION_xhprof'] = '1'
+            envvars['PHP_INI-xhprof.output_dir'] = '/var/www/moodledata/xhprof'
 
         r, _, _ = process(
             [
@@ -224,6 +237,7 @@ class DockerCommand(Command):
             raise Exception('Failed to start the container.')
 
         logging.info(f'The container "{dockername}" has been started on port {port}.')
+        open_instance_in_browser_if_needed()
 
     def run_down(self, args: argparse.Namespace):
         M = self.Wp.resolve(args.instance, raise_exception=True)
